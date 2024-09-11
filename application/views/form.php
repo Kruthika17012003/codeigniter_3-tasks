@@ -108,8 +108,6 @@
                 <th>Name</th>
                 <th>Phone Number</th>
                 <th>Group</th>
-				<th>Status</th>
-                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -119,11 +117,7 @@
                     <td><?php echo $user['UserID']; ?></td>
                     <td><?php echo $user['Name']; ?></td>
                     <td><?php echo $user['phoneNumber']; ?></td>
-                    <td><?php echo $user['group_id']; ?></td> <!-- Display group id -->
-					<td><?php echo $user['status'] == 1 ? '1' : 'Deleted'; ?></td>
-                <td>
-                    <button class="deleteBtn" data-id="<?php echo $user['id']; ?>">Delete</button>
-                </td>
+                    <td><?php echo $user['group_id']; ?></td> <!-- Display group name -->
                 </tr>
             <?php endforeach; ?>
         </tbody>
@@ -178,8 +172,6 @@
                                     '<td>' + user.Name + '</td>' +
                                     '<td>' + user.phoneNumber + '</td>' +
                                     '<td>' + user.group_id + '</td>' +
-									'<td>' + status + '</td>' +
-                                '<td><button class="deleteBtn" data-id="' + user.id + '">Delete</button></td>' +
                                     '</tr>';
                             });
                         } else {
@@ -198,63 +190,5 @@
             });
         });
     </script>
-
-
-<!-- <script>
-        $(document).ready(function() {
-            // Submit form without refreshing page
-            $("#userForm").on('submit', function(event) {
-                event.preventDefault();
-
-                $.ajax({
-                    url: "<?= site_url('users/create_user'); ?>",
-                    method: "POST",
-                    data: $(this).serialize(),
-                    success: function(response) {
-                        loadUsers();
-                        $("#userForm")[0].reset();
-                    }
-                });
-            });
-
-            // Fetch and display users without refreshing
-            function loadUsers() {
-                $.ajax({
-                    url: "<?= site_url('users/fetch_users'); ?>",
-                    method: "GET",
-                    success: function(data) {
-                        var users = JSON.parse(data).users;
-                        var userTable = $('#userTable tbody');
-                        userTable.empty();
-
-                        users.forEach(function(user) {
-                            var row = `<tr>
-                                <td>${user.user_id}</td>
-                                <td>${user.name}</td>
-                                <td>${user.phone_number}</td>
-                                <td>${user.group_name}</td>
-                                <td><button class="deleteBtn" data-id="${user.id}">Delete</button></td>
-                            </tr>`;
-                            userTable.append(row);
-                        });
-                    }
-                });
-            }
-
-            // Delete user
-            $(document).on('click', '.deleteBtn', function() {
-                var id = $(this).data('id');
-                $.ajax({
-                    url: "<?= site_url('users/delete_user/'); ?>" + id,
-                    method: "POST",
-                    success: function(response) {
-                        loadUsers();
-                    }
-                });
-            });
-
-            loadUsers();
-        });
-    </script> -->
 </body>
 </html>

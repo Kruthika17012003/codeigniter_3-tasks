@@ -57,6 +57,7 @@ $route['User_form'] = 'User/index'; //display the user form
 $route['Users_data'] = 'User/display'; //display the users details filled in the form
 $route['Groups_data'] = 'User/groups'; //displays the group details
 $route['submit'] = 'User/submit'; 
+$route['delete'] = 'User/soft_delete_user';
 
 $route['upload-csv'] = 'UserController/uploadCSV';//to get info about repeated email_id and count in postman application
 
