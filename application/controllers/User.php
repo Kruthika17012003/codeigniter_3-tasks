@@ -49,8 +49,6 @@ class User extends CI_Controller {
 		// Output JSON response
 		echo json_encode($response);
 	}
-	
-	
 
     public function display() {
         $data['users'] = $this->User_model->get_users(); // Fetch users from the model
@@ -64,8 +62,6 @@ class User extends CI_Controller {
     }
 
 	public function delete_user($id) {
-		// Load the model if not already loaded
-		$this->load->model('User_model');
 	
 		// Soft delete by updating the status to 0
 		$result = $this->User_model->soft_delete_user($id);
@@ -83,6 +79,33 @@ class User extends CI_Controller {
         $this->db->where('id', $id);
         return $this->db->update('users'); // Return true/false based on success
     }
+
+	private function session_timeout_check() {
+        $session_expiry_time = 3; // Set the session timeout for 3 seconds
+
+        if ($this->session->userdata('last_activity')) {
+            // Calculate the time since the last activity
+            $time_inactive = time() - $this->session->userdata('last_activity');
+
+            // Check if the session is expired
+            if ($time_inactive > $session_expiry_time) {
+                // Destroy the session and redirect to login page
+                $this->session->sess_destroy();
+                redirect('login');
+            } else {
+                // Update the last activity time
+                $this->session->set_userdata('last_activity', time());
+            }
+        }
+    }
+	public function user_form() {
+		if (!$this->session->userdata('logged_in')) {
+			redirect('login'); // Redirect to login if session expired
+		}
+		// Load the user form view
+		$this->load->view('user_form');
+	}
+	
 
 }
 ?>

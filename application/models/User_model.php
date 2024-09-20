@@ -9,6 +9,11 @@ class User_model extends CI_Model {
         return $this->db->insert('users', $user_data);
     }
 
+	public function soft_delete_user($user_id) {
+        $this->db->where('id', $user_id);
+        return $this->db->update('users', ['deleted_at' => date('Y-m-d H:i:s')]);
+    }
+
     public function get_users() {
         $this->db->select('users.*, groups.name as group_name');
         $this->db->from('users');

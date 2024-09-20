@@ -120,7 +120,7 @@
                     <td><?php echo $user['Name']; ?></td>
                     <td><?php echo $user['phoneNumber']; ?></td>
                     <td><?php echo $user['group_id']; ?></td> <!-- Display group id -->
-					<td><?php echo $user['status'] == 1 ? '1' : 'Deleted'; ?></td>
+					<td><?php echo $user['status'] == 1 ? '1' : '0'; ?></td>
                 <td>
                     <button class="deleteBtn" data-id="<?php echo $user['id']; ?>">Delete</button>
                 </td>
@@ -197,64 +197,73 @@
                 });
             });
         });
+
+		$(document).on('click', '.deleteBtn', function() {
+    var userId = $(this).data('id');
+
+    // Send AJAX request to delete the user
+    $.ajax({
+        type: 'POST',
+        url: 'http://localhost/codeigniter_3/index.php/User/delete_user', // Adjust URL
+        data: { id: userId },
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success') {
+                $('#message').text(response.message).css('color', 'green');
+
+                // Update user table
+                var rows = '';
+                if (Array.isArray(response.users) && response.users.length > 0) {
+                    $.each(response.users, function(index, user) {
+                        rows += '<tr>' +
+                            '<td>' + user.id + '</td>' +
+                            '<td>' + user.UserID + '</td>' +
+                            '<td>' + user.Name + '</td>' +
+                            '<td>' + user.phoneNumber + '</td>' +
+                            '<td>' + user.group_id + '</td>' +
+                            '<td>' + (user.status || 'N/A') + '</td>' +
+                            '<td><button class="deleteBtn" data-id="' + user.id + '">Delete</button></td>' +
+                        '</tr>';
+                    });
+                } else {
+                    rows = '<tr><td colspan="5">No users found</td></tr>';
+                }
+                $('#userTable tbody').html(rows); // Update the table body
+            } else {
+                $('#message').text(response.message).css('color', 'red');
+            }
+        },
+        error: function(xhr, status, error) {
+            $('#message').text('An error occurred: ' + xhr.status + ' ' + error).css('color', 'red');
+        }
+    });
+});
     </script>
 
+<script>
+    // Set a timeout for redirection after 3 seconds of inactivity
+    let timeout;
 
-<!-- <script>
-        $(document).ready(function() {
-            // Submit form without refreshing page
-            $("#userForm").on('submit', function(event) {
-                event.preventDefault();
+    function resetTimer() {
+        clearTimeout(timeout);
+        timeout = setTimeout(function() {
+            window.location.href = '<?php echo site_url('login'); ?>';
+        }, 3000); // Redirect after 3 seconds
+    }
 
-                $.ajax({
-                    url: "<?= site_url('users/create_user'); ?>",
-                    method: "POST",
-                    data: $(this).serialize(),
-                    success: function(response) {
-                        loadUsers();
-                        $("#userForm")[0].reset();
-                    }
-                });
-            });
+    // Event listeners for user activity
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
 
-            // Fetch and display users without refreshing
-            function loadUsers() {
-                $.ajax({
-                    url: "<?= site_url('users/fetch_users'); ?>",
-                    method: "GET",
-                    success: function(data) {
-                        var users = JSON.parse(data).users;
-                        var userTable = $('#userTable tbody');
-                        userTable.empty();
+    // Initialize the timer on load
+    resetTimer();
+</script>
 
-                        users.forEach(function(user) {
-                            var row = `<tr>
-                                <td>${user.user_id}</td>
-                                <td>${user.name}</td>
-                                <td>${user.phone_number}</td>
-                                <td>${user.group_name}</td>
-                                <td><button class="deleteBtn" data-id="${user.id}">Delete</button></td>
-                            </tr>`;
-                            userTable.append(row);
-                        });
-                    }
-                });
-            }
-
-            // Delete user
-            $(document).on('click', '.deleteBtn', function() {
-                var id = $(this).data('id');
-                $.ajax({
-                    url: "<?= site_url('users/delete_user/'); ?>" + id,
-                    method: "POST",
-                    success: function(response) {
-                        loadUsers();
-                    }
-                });
-            });
-
-            loadUsers();
-        });
-    </script> -->
+	<script>
+    setTimeout(function() {
+        window.location.href = '<?php echo site_url('login'); ?>';
+    }, 3000); // Redirect after 3 seconds
+</script>
 </body>
 </html>
