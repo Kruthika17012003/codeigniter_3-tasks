@@ -7,6 +7,9 @@ class User extends CI_Controller {
         parent::__construct();
         $this->load->model('User_model'); // Load the User model
 		$this->load->model('Group_model'); //Load the Group model
+		$this->load->library('session'); //load the session library
+		$this->load->helper('url');  // Load URL helper to use redirect() function
+		$this->session_timeout_check();  // Check session timeout on every page load
 		// $this->load->library('input'); // Load input library (optional as it's loaded by default)
     }
 
@@ -80,31 +83,44 @@ class User extends CI_Controller {
         return $this->db->update('users'); // Return true/false based on success
     }
 
-	private function session_timeout_check() {
-        $session_expiry_time = 3; // Set the session timeout for 3 seconds
-
-        if ($this->session->userdata('last_activity')) {
-            // Calculate the time since the last activity
-            $time_inactive = time() - $this->session->userdata('last_activity');
-
-            // Check if the session is expired
-            if ($time_inactive > $session_expiry_time) {
-                // Destroy the session and redirect to login page
-                $this->session->sess_destroy();
-                redirect('login');
-            } else {
-                // Update the last activity time
-                $this->session->set_userdata('last_activity', time());
-            }
-        }
-    }
-	public function user_form() {
-		if (!$this->session->userdata('logged_in')) {
-			redirect('login'); // Redirect to login if session expired
+	public function session_timeout_check() {
+		$session_expiry_time = 3;  // Set session timeout for 3 seconds
+	
+		// Check if last activity is set
+		if ($this->session->userdata('last_activity')) {
+			$time_inactive = time() - $this->session->userdata('last_activity');
+			
+			// Debugging: Log session information
+			log_message('debug', 'Time inactive: ' . $time_inactive);
+			
+			// If the session has been inactive longer than the expiry time, destroy the session
+			if ($time_inactive > $session_expiry_time) {
+				log_message('debug', 'Session expired, destroying session.');
+				$this->session->sess_destroy();
+				
+				// After session destruction, redirect to the login page
+				redirect('login');
+				exit;
+			} else {
+				// If session is still active, update the last activity time
+				log_message('debug', 'Session active, updating last activity time.');
+				$this->session->set_userdata('last_activity', time());
+			}
+		} else {
+			// If last_activity is not set, initialize it with the current time
+			log_message('debug', 'Setting initial last activity time.');
+			$this->session->set_userdata('last_activity', time());
 		}
-		// Load the user form view
-		$this->load->view('user_form');
 	}
+	
+
+    public function user_form() {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('login');  // Redirect to login if session expired
+        }
+        // Load the user form view
+        $this->load->view('user_form');
+    }
 	
 
 }

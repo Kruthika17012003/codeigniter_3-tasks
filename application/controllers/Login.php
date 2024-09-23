@@ -37,7 +37,9 @@ class Login extends CI_Controller {
 
 	public function login() {
 		// Load the model
-		$this->load->model('User_model');
+		$this->load->model('Login_model');
+		$this->session->set_userdata('logged_in', TRUE);
+        redirect('user_form');
 	
 		// Get form data
 		$username = $this->input->post('username');
@@ -54,12 +56,21 @@ class Login extends CI_Controller {
 				'password' => password_hash($password, PASSWORD_BCRYPT) // Hash the password
 			);
 	
-			// Attempt to update or insert data
-			$this->User_model->update_user($data); // Ensure this method is defined in your model
-	
-			// Redirect or load another view upon successful login
-			redirect('User_form');
-		}
+			// Attempt to update or insert
+			if ($this->User_model->update_or_insert_user($data)) {
+				// Successful login
+				redirect('user_form');
+			} else {
+				// Log error if database update/insert failed
+				log_message('error', 'Failed to update or insert user data');
+			}
 	}
 	
 }
+public function logout() {
+	// Destroy session on logout
+	$this->session->sess_destroy();
+	redirect('login');
+}
+}
+?>

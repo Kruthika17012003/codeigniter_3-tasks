@@ -241,29 +241,25 @@
     </script>
 
 <script>
-    // Set a timeout for redirection after 3 seconds of inactivity
-    let timeout;
+    // Get the current time when the page loads
+    var lastActivity = Date.now();
 
-    function resetTimer() {
-        clearTimeout(timeout);
-        timeout = setTimeout(function() {
-            window.location.href = '<?php echo site_url('login'); ?>';
-        }, 3000); // Redirect after 3 seconds
-    }
+    // Monitor any keypress or click events to reset the last activity
+    document.onkeypress = document.onclick = function() {
+        lastActivity = Date.now();
+    };
 
-    // Event listeners for user activity
-    window.onload = resetTimer;
-    document.onmousemove = resetTimer;
-    document.onkeypress = resetTimer;
-
-    // Initialize the timer on load
-    resetTimer();
+    // Check the inactivity every second
+    setInterval(function() {
+        var currentTime = Date.now();
+        var timeDifference = (currentTime - lastActivity) / 1000; // Difference in seconds
+        
+        // If the user is inactive for more than 3 seconds, redirect to the login page
+        if (timeDifference > 3) {
+            window.location.href = "<?= base_url('login'); ?>"; // Redirect to login page
+        }
+    }, 1000);
 </script>
 
-	<script>
-    setTimeout(function() {
-        window.location.href = '<?php echo site_url('login'); ?>';
-    }, 3000); // Redirect after 3 seconds
-</script>
 </body>
 </html>

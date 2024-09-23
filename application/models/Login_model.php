@@ -18,6 +18,18 @@ public function validate_user($username, $password) {
 	return false;
 }
 
+
+public function update_user($data) {
+    $this->db->where('username', $data['username']);
+    $this->db->update('users1', $data);
+    
+    // Log the last executed query
+    log_message('debug', $this->db->last_query());
+    
+    return $this->db->affected_rows() > 0;  // Check if rows were updated
+}
+
+
 public function update_last_login($user_id) {
 	// Update the last_login time for the user in 'users1'
 	$data = array(
